@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History | NovaHealth Pro</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-[#0A0B0E] font-['Inter']">
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 bg-[#0A0B0E]/95 backdrop-blur-xl border-b border-[#1E293B]">
+        <div class="container mx-auto px-6">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-[#3B82F6] to-[#2563EB] rounded-xl flex items-center justify-center">
+                        <i class="fas fa-cube text-white text-lg"></i>
+                    </div>
+                    <span class="text-xl font-bold text-white">Nova<span class="text-[#3B82F6]">Health</span></span>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="index.html" class="nav-link">Dashboard</a>
+                    <a href="bmi.html" class="nav-link">BMI</a>
+                    <a href="carbon.html" class="nav-link">Carbon</a>
+                    <a href="bmr.html" class="nav-link">BMR</a>
+                    <a href="ideal-weight.html" class="nav-link">Ideal Weight</a>
+                    <a href="analytics.html" class="nav-link">Analytics</a>
+                    <a href="history.html" class="nav-link active">History</a>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <button class="w-10 h-10 rounded-xl bg-[#1E293B] flex items-center justify-center hover:bg-[#2D3A4F] transition">
+                        <i class="fas fa-bell text-[#94A3B8]"></i>
+                    </button>
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#2563EB] flex items-center justify-center">
+                        <span class="text-white font-medium">AP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="pt-20 bg-gradient-to-r from-[#6366F1]/10 to-transparent border-b border-[#1E293B]">
+        <div class="container mx-auto px-6 py-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-white">Health <span class="text-[#6366F1]">History</span></h1>
+                    <p class="text-[#94A3B8] mt-1">View and manage all your past calculations</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="clearHistory()" class="px-4 py-2 bg-[#1E293B] rounded-xl text-[#EF4444] hover:bg-[#2D3A4F] transition">
+                        <i class="fas fa-trash mr-2"></i>Clear All
+                    </button>
+                    <button onclick="exportHistory()" class="px-4 py-2 bg-[#6366F1] rounded-xl text-white hover:bg-[#4F46E5] transition">
+                        <i class="fas fa-file-export mr-2"></i>Export CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+        <!-- Filter Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+            <div class="flex space-x-2">
+                <button onclick="filterHistory('all')" class="filter-btn active px-4 py-2 bg-[#6366F1] text-white rounded-lg text-sm">All</button>
+                <button onclick="filterHistory('BMI')" class="filter-btn px-4 py-2 bg-[#1E293B] text-[#94A3B8] rounded-lg text-sm hover:bg-[#2D3A4F] transition">BMI</button>
+                <button onclick="filterHistory('Carbon')" class="filter-btn px-4 py-2 bg-[#1E293B] text-[#94A3B8] rounded-lg text-sm hover:bg-[#2D3A4F] transition">Carbon</button>
+                <button onclick="filterHistory('BMR')" class="filter-btn px-4 py-2 bg-[#1E293B] text-[#94A3B8] rounded-lg text-sm hover:bg-[#2D3A4F] transition">BMR</button>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-search text-[#64748B]"></i>
+                <input type="text" id="searchHistory" placeholder="Search records..." class="bg-[#1E293B] border border-[#2D3A4F] rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-[#6366F1]">
+            </div>
+        </div>
+
+        <!-- History Table -->
+        <div class="calculator-card overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-[#1E293B]">
+                            <th class="text-left py-4 px-4 text-[#94A3B8] font-medium text-sm">Type</th>
+                            <th class="text-left py-4 px-4 text-[#94A3B8] font-medium text-sm">Result</th>
+                            <th class="text-left py-4 px-4 text-[#94A3B8] font-medium text-sm">Category</th>
+                            <th class="text-left py-4 px-4 text-[#94A3B8] font-medium text-sm">Date</th>
+                            <th class="text-left py-4 px-4 text-[#94A3B8] font-medium text-sm">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <!-- Filled by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Empty State -->
+            <div id="emptyHistory" class="text-center py-16 hidden">
+                <div class="w-24 h-24 bg-[#1E293B] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-history text-[#6366F1] text-3xl"></i>
+                </div>
+                <p class="text-[#64748B]">No history records found</p>
+                <p class="text-[#4A5568] text-sm mt-2">Start calculating to see your history here</p>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex items-center justify-between mt-6">
+            <p class="text-[#64748B] text-sm" id="showingText">Showing 1-10 of 47 records</p>
+            <div class="flex space-x-2">
+                <button class="w-10 h-10 bg-[#1E293B] rounded-lg text-[#94A3B8] hover:bg-[#2D3A4F] transition">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="w-10 h-10 bg-[#6366F1] rounded-lg text-white">1</button>
+                <button class="w-10 h-10 bg-[#1E293B] rounded-lg text-[#94A3B8] hover:bg-[#2D3A4F] transition">2</button>
+                <button class="w-10 h-10 bg-[#1E293B] rounded-lg text-[#94A3B8] hover:bg-[#2D3A4F] transition">3</button>
+                <button class="w-10 h-10 bg-[#1E293B] rounded-lg text-[#94A3B8] hover:bg-[#2D3A4F] transition">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+    <script src="js/anti-spam.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/history.js"></script>
+</body>
+</html>

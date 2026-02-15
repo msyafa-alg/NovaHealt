@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BMI Calculator | NovaHealth Pro</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        @media (max-width: 768px) {
+            .nav-menu {
+                position: fixed;
+                top: 80px;
+                left: -100%;
+                width: 80%;
+                height: calc(100vh - 80px);
+                background: #0F1117;
+                border-right: 1px solid #1E293B;
+                transition: 0.3s ease;
+                padding: 2rem 1.5rem;
+                z-index: 100;
+            }
+            .nav-menu.active { left: 0; }
+            .nav-overlay {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                width: 100%;
+                height: calc(100vh - 80px);
+                background: rgba(0,0,0,0.7);
+                backdrop-filter: blur(4px);
+                z-index: 90;
+                opacity: 0;
+                visibility: hidden;
+                transition: 0.3s ease;
+            }
+            .nav-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+            .nav-link {
+                display: block;
+                padding: 1rem;
+                font-size: 1.1rem;
+                border-bottom: 1px solid #1E293B;
+            }
+            .calculator-input { font-size: 16px !important; }
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .bmi-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .status-badge {
+            transition: all 0.3s ease;
+        }
+        
+        .status-badge:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-[#0A0B0E] font-['Inter']">
+    <!-- Navbar SAMA PERSIS -->
+    <nav class="fixed w-full z-50 bg-[#0A0B0E]/95 backdrop-blur-xl border-b border-[#1E293B]">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-[#3B82F6] to-[#2563EB] rounded-xl flex items-center justify-center">
+                        <i class="fas fa-cube text-white text-sm sm:text-lg"></i>
+                    </div>
+                    <span class="text-lg sm:text-xl font-bold text-white">Nova<span class="text-[#3B82F6]">Health</span></span>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="index.html" class="nav-link">Dashboard</a>
+                    <a href="bmi.html" class="nav-link active">BMI</a>
+                    <a href="carbon.html" class="nav-link">Carbon</a>
+                    <a href="bmr.html" class="nav-link">BMR</a>
+                    <a href="ideal-weight.html" class="nav-link">Ideal Weight</a>
+                    <a href="analytics.html" class="nav-link">Analytics</a>
+                    <a href="history.html" class="nav-link">History</a>
+                </div>
+
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <button class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#1E293B] flex items-center justify-center hover:bg-[#2D3A4F] transition">
+                        <i class="fas fa-bell text-[#94A3B8] text-sm sm:text-base"></i>
+                    </button>
+                    <button id="menuBtn" class="md:hidden w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#1E293B] flex items-center justify-center hover:bg-[#2D3A4F] transition">
+                        <i class="fas fa-bars text-[#94A3B8] text-lg"></i>
+                    </button>
+                    <div class="hidden sm:block w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#2563EB] flex items-center justify-center">
+                        <span class="text-white font-medium text-sm">AP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="overlay" class="nav-overlay md:hidden"></div>
+    <div id="mobileMenu" class="nav-menu md:hidden">
+        <div class="flex flex-col space-y-2">
+            <a href="index.html" class="nav-link text-[#94A3B8]"><i class="fas fa-home w-6 mr-3"></i>Dashboard</a>
+            <a href="bmi.html" class="nav-link active bg-[#1E293B] text-[#3B82F6]"><i class="fas fa-weight-scale w-6 mr-3"></i>BMI</a>
+            <a href="carbon.html" class="nav-link text-[#94A3B8]"><i class="fas fa-leaf w-6 mr-3"></i>Carbon</a>
+            <a href="bmr.html" class="nav-link text-[#94A3B8]"><i class="fas fa-fire w-6 mr-3"></i>BMR</a>
+            <a href="ideal-weight.html" class="nav-link text-[#94A3B8]"><i class="fas fa-dumbbell w-6 mr-3"></i>Ideal Weight</a>
+            <a href="analytics.html" class="nav-link text-[#94A3B8]"><i class="fas fa-chart-line w-6 mr-3"></i>Analytics</a>
+            <a href="history.html" class="nav-link text-[#94A3B8]"><i class="fas fa-history w-6 mr-3"></i>History</a>
+        </div>
+        <div class="absolute bottom-8 left-4 right-4">
+            <div class="bg-[#1E293B] rounded-xl p-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#2563EB] flex items-center justify-center">
+                        <span class="text-white font-medium">AP</span>
+                    </div>
+                    <div>
+                        <p class="text-white text-sm font-medium">Alexander Pierce</p>
+                        <p class="text-[#64748B] text-xs">Enterprise Plan</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="pt-20 bg-gradient-to-r from-[#3B82F6]/10 to-transparent border-b border-[#1E293B]">
+        <div class="container mx-auto px-4 py-6 sm:py-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="flex items-center space-x-2 text-sm mb-2">
+                        <a href="index.html" class="text-[#64748B] hover:text-white transition">Dashboard</a>
+                        <i class="fas fa-chevron-right text-[#64748B] text-xs"></i>
+                        <span class="text-white">BMI Calculator</span>
+                    </div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white">Body Mass Index <span class="text-[#3B82F6]">Calculator</span></h1>
+                    <p class="text-[#94A3B8] text-sm sm:text-base mt-1">Cek status berat badan idealmu dan dapatkan rekomendasi kesehatan</p>
+                </div>
+                <div class="hidden sm:flex items-center space-x-2">
+                    <div class="bg-[#1E293B] px-4 py-2 rounded-xl">
+                        <span class="text-[#3B82F6] text-sm"><i class="fas fa-heart-pulse mr-1"></i> Health Score</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Calculator Form -->
+            <div class="calculator-card">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-[#3B82F6]/20 rounded-xl flex items-center justify-center bmi-icon">
+                        <i class="fas fa-weight-scale text-[#3B82F6] text-lg sm:text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-bold text-white">Input Data Kamu</h2>
+                        <p class="text-[#64748B] text-xs sm:text-sm">Masukkan data untuk menghitung BMI</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <!-- Height -->
+                    <div>
+                        <label class="block text-[#94A3B8] text-xs sm:text-sm mb-2">
+                            <i class="fas fa-ruler mr-2 text-[#3B82F6]"></i>Tinggi Badan (cm)
+                        </label>
+                        <input type="number" id="tinggi" class="calculator-input w-full p-3 bg-[#1E293B] border border-[#2D3A4F] rounded-xl text-white" placeholder="Contoh: 170" value="170" min="100" max="250">
+                        <p class="text-[#64748B] text-xs mt-1">📏 Rentang normal: 100 - 250 cm</p>
+                    </div>
+                    
+                    <!-- Weight -->
+                    <div>
+                        <label class="block text-[#94A3B8] text-xs sm:text-sm mb-2">
+                            <i class="fas fa-weight-hanging mr-2 text-[#3B82F6]"></i>Berat Badan (kg)
+                        </label>
+                        <input type="number" id="berat" class="calculator-input w-full p-3 bg-[#1E293B] border border-[#2D3A4F] rounded-xl text-white" placeholder="Contoh: 65" value="65" min="30" max="200">
+                        <p class="text-[#64748B] text-xs mt-1">⚖️ Rentang normal: 30 - 200 kg</p>
+                    </div>
+                    
+                    <!-- Age -->
+                    <div>
+                        <label class="block text-[#94A3B8] text-xs sm:text-sm mb-2">
+                            <i class="fas fa-calendar mr-2 text-[#3B82F6]"></i>Usia (tahun)
+                        </label>
+                        <input type="number" id="usia" class="calculator-input w-full p-3 bg-[#1E293B] border border-[#2D3A4F] rounded-xl text-white" placeholder="Contoh: 25" value="25" min="15" max="100">
+                    </div>
+                    
+                    <!-- Gender -->
+                    <div>
+                        <label class="block text-[#94A3B8] text-xs sm:text-sm mb-2">
+                            <i class="fas fa-venus-mars mr-2 text-[#3B82F6]"></i>Jenis Kelamin
+                        </label>
+                        <select id="gender" class="calculator-input w-full p-3 bg-[#1E293B] border border-[#2D3A4F] rounded-xl text-white">
+                            <option value="male">Laki-laki</option>
+                            <option value="female">Perempuan</option>
+                        </select>
+                    </div>
+
+                    <!-- Calculate Button -->
+                    <button onclick="hitungBMI()" class="w-full bg-gradient-to-r from-[#3B82F6] to-[#2563EB] text-white py-4 rounded-xl font-medium hover:shadow-lg hover:shadow-[#3B82F6]/20 transition-all transform hover:scale-[1.02] flex items-center justify-center space-x-2 mt-4">
+                        <i class="fas fa-calculator"></i>
+                        <span>Hitung BMI</span>
+                    </button>
+                </div>
+
+                <!-- Info Box -->
+                <div class="mt-6 p-4 bg-[#1E293B] rounded-xl">
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-info-circle text-[#3B82F6] mt-1"></i>
+                        <div>
+                            <p class="text-white text-xs sm:text-sm font-medium">Apa itu BMI?</p>
+                            <p class="text-[#94A3B8] text-xs mt-1">Body Mass Index (BMI) adalah ukuran yang digunakan untuk menilai apakah berat badan ideal berdasarkan tinggi badan.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Area -->
+            <div class="calculator-card" id="resultCard">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-[#3B82F6]/20 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-heart-pulse text-[#3B82F6] text-lg sm:text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg sm:text-xl font-bold text-white">Hasil BMI Kamu</h2>
+                            <p class="text-[#64748B] text-xs sm:text-sm">Lihat status berat badanmu</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="exportBMIPDF()" class="px-3 py-1.5 bg-[#1E293B] rounded-lg text-[#94A3B8] hover:text-white transition text-xs">
+                            <i class="fas fa-download mr-1"></i> PDF
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Result Container -->
+                <div id="bmiResult" class="hidden">
+                    <!-- Diisi JavaScript -->
+                </div>
+                
+                <!-- Empty State -->
+                <div id="emptyBmiResult" class="text-center py-12">
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-[#3B82F6]/20 to-[#2563EB]/20 rounded-full flex items-center justify-center mx-auto mb-4 bmi-icon">
+                        <i class="fas fa-weight-scale text-[#3B82F6] text-3xl sm:text-4xl"></i>
+                    </div>
+                    <p class="text-[#E2E8F0] text-base sm:text-lg font-medium mb-2">Hitung BMI-mu Sekarang! 📊</p>
+                    <p class="text-[#64748B] text-xs sm:text-sm max-w-sm mx-auto">
+                        Masukkan tinggi dan berat badanmu untuk mengetahui apakah berat badanmu ideal, kurang, atau berlebih.
+                    </p>
+                </div>
+            </div>
+
+            <!-- BMI Chart & Tips -->
+            <div class="calculator-card lg:col-span-2" id="tipsCard" style="display: none;">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-[#3B82F6]/20 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-chart-simple text-[#3B82F6] text-lg sm:text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-bold text-white">📊 Klasifikasi BMI & Rekomendasi</h2>
+                        <p class="text-[#64748B] text-xs sm:text-sm">Panduan berdasarkan hasil BMI kamu</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="p-4 bg-[#1E293B] rounded-xl">
+                        <div class="w-full h-2 bg-[#3B82F6] rounded-full mb-3"></div>
+                        <p class="text-white font-medium">Underweight</p>
+                        <p class="text-[#94A3B8] text-sm">&lt; 18.5</p>
+                        <p class="text-[#64748B] text-xs mt-2">Kurus · Perlu tambah berat badan</p>
+                    </div>
+                    
+                    <div class="p-4 bg-[#1E293B] rounded-xl">
+                        <div class="w-full h-2 bg-[#10B981] rounded-full mb-3"></div>
+                        <p class="text-white font-medium">Normal</p>
+                        <p class="text-[#94A3B8] text-sm">18.5 - 24.9</p>
+                        <p class="text-[#64748B] text-xs mt-2">Ideal · Pertahankan!</p>
+                    </div>
+                    
+                    <div class="p-4 bg-[#1E293B] rounded-xl">
+                        <div class="w-full h-2 bg-[#F59E0B] rounded-full mb-3"></div>
+                        <p class="text-white font-medium">Overweight</p>
+                        <p class="text-[#94A3B8] text-sm">25 - 29.9</p>
+                        <p class="text-[#64748B] text-xs mt-2">Kelebihan · Mulai diet sehat</p>
+                    </div>
+                    
+                    <div class="p-4 bg-[#1E293B] rounded-xl">
+                        <div class="w-full h-2 bg-[#EF4444] rounded-full mb-3"></div>
+                        <p class="text-white font-medium">Obesitas</p>
+                        <p class="text-[#94A3B8] text-sm">≥ 30</p>
+                        <p class="text-[#64748B] text-xs mt-2">Obesitas · Konsultasi dokter</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Mobile Menu Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuBtn = document.getElementById('menuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('overlay');
+            
+            if (menuBtn && mobileMenu && overlay) {
+                menuBtn.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                    
+                    const icon = menuBtn.querySelector('i');
+                    if (mobileMenu.classList.contains('active')) {
+                        icon.classList.remove('fa-bars');
+                        icon.classList.add('fa-times');
+                    } else {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                });
+                
+                overlay.addEventListener('click', function() {
+                    mobileMenu.classList.remove('active');
+                    overlay.classList.remove('active');
+                    const icon = menuBtn.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                });
+            }
+        });
+
+        // Hitung BMI
+        function hitungBMI() {
+            // Ambil nilai
+            const tinggi = parseFloat(document.getElementById('tinggi').value) / 100;
+            const berat = parseFloat(document.getElementById('berat').value);
+            const usia = parseFloat(document.getElementById('usia').value);
+            const gender = document.getElementById('gender').value;
+            
+            // Validasi
+            if (!tinggi || !berat || !usia) {
+                alert('Harap isi semua field!');
+                return;
+            }
+            
+            // Hitung BMI
+            const bmi = berat / (tinggi * tinggi);
+            
+            // Tentukan kategori
+            let kategori = '', warna = '', icon = '', rekomendasi = '', saran = '';
+            
+            if (bmi < 18.5) {
+                kategori = 'Underweight (Kurus)';
+                warna = 'text-[#3B82F6]';
+                icon = 'fa-face-frown';
+                rekomendasi = 'Kamu kekurangan berat badan';
+                saran = 'Tingkatkan asupan kalori dengan makanan bergizi. Konsumsi lebih banyak protein, karbohidrat, dan lemak sehat. Olahraga angkat beban bisa membantu membentuk otot.';
+            } else if (bmi < 25) {
+                kategori = 'Normal (Ideal)';
+                warna = 'text-[#10B981]';
+                icon = 'fa-face-smile';
+                rekomendasi = 'Berat badanmu ideal!';
+                saran = 'Pertahankan pola makan sehat dan olahraga teratur. Konsumsi makanan seimbang dan jaga gaya hidup aktif.';
+            } else if (bmi < 30) {
+                kategori = 'Overweight (Kelebihan)';
+                warna = 'text-[#F59E0B]';
+                icon = 'fa-face-meh';
+                rekomendasi = 'Kamu kelebihan berat badan';
+                saran = 'Mulai program penurunan berat badan secara sehat. Kurangi gula dan karbohidrat sederhana, perbanyak sayur dan protein. Olahraga kardio 30 menit per hari.';
+            } else {
+                kategori = 'Obesitas';
+                warna = 'text-[#EF4444]';
+                icon = 'fa-face-dizzy';
+                rekomendasi = 'Kamu mengalami obesitas';
+                saran = 'Konsultasikan dengan dokter atau ahli gizi. Perlu program diet khusus dan olahraga teratur. Hindari makanan tinggi lemak dan gula.';
+            }
+            
+            // Hitung berat ideal
+            const idealMin = (18.5 * (tinggi * tinggi)).toFixed(1);
+            const idealMax = (24.9 * (tinggi * tinggi)).toFixed(1);
+            
+            // Tampilkan hasil
+            document.getElementById('emptyBmiResult').style.display = 'none';
+            document.getElementById('bmiResult').classList.remove('hidden');
+            document.getElementById('tipsCard').style.display = 'block';
+            
+            const resultDiv = document.getElementById('bmiResult');
+            resultDiv.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Main Result -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="text-center p-4 sm:p-6 bg-gradient-to-br from-[#3B82F6]/20 to-[#2563EB]/20 rounded-2xl">
+                            <p class="text-[#94A3B8] text-xs sm:text-sm mb-2">BMI Kamu</p>
+                            <div class="text-4xl sm:text-5xl font-bold text-[#3B82F6]">${bmi.toFixed(1)}</div>
+                        </div>
+                        
+                        <div class="text-center p-4 sm:p-6 bg-gradient-to-br from-[#10B981]/20 to-[#059669]/20 rounded-2xl">
+                            <p class="text-[#94A3B8] text-xs sm:text-sm mb-2">Berat Ideal</p>
+                            <div class="text-2xl sm:text-3xl font-bold text-[#10B981]">${idealMin} - ${idealMax}</div>
+                            <p class="text-[#64748B] text-xs mt-2">kg</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Status Badge -->
+                    <div class="flex items-center justify-center space-x-3 p-4 bg-[#1E293B] rounded-xl">
+                        <i class="fas ${icon} ${warna} text-2xl"></i>
+                        <div>
+                            <span class="text-white text-sm sm:text-base">Status: </span>
+                            <span class="font-bold ${warna} text-sm sm:text-base">${kategori}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Rekomendasi Card - SEPERTI POHON DI CARBON -->
+                    <div class="p-6 bg-gradient-to-br from-[#3B82F6]/30 to-[#2563EB]/30 rounded-2xl border-2 border-[#3B82F6]/50">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-[#3B82F6] rounded-xl flex items-center justify-center">
+                                    <i class="fas ${icon} text-white text-2xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-white text-base sm:text-lg font-bold">${rekomendasi}</p>
+                                    <p class="text-[#94A3B8] text-xs">Rekomendasi untukmu</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Progress Bar -->
+                        <div class="mt-4">
+                            <div class="flex justify-between text-xs text-[#94A3B8] mb-1">
+                                <span>Skala BMI</span>
+                                <span>${bmi.toFixed(1)}</span>
+                            </div>
+                            <div class="h-3 bg-[#1E293B] rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-[#3B82F6] to-[#2563EB] rounded-full" style="width: ${Math.min((bmi / 40) * 100, 100)}%"></div>
+                            </div>
+                            <div class="flex justify-between text-[10px] text-[#64748B] mt-1">
+                                <span>18.5</span>
+                                <span>25</span>
+                                <span>30</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Saran -->
+                        <div class="mt-4 p-3 bg-[#1E293B]/80 rounded-xl">
+                            <p class="text-[#94A3B8] text-xs sm:text-sm">
+                                <i class="fas fa-quote-left text-[#3B82F6] mr-1"></i>
+                                ${saran}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Breakdown -->
+                    <div>
+                        <p class="text-[#94A3B8] text-sm mb-3">Detail perhitungan:</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-[#1E293B] p-3 rounded-xl">
+                                <p class="text-[#64748B] text-xs">Tinggi</p>
+                                <p class="text-white font-medium">${(tinggi * 100).toFixed(0)} cm</p>
+                            </div>
+                            <div class="bg-[#1E293B] p-3 rounded-xl">
+                                <p class="text-[#64748B] text-xs">Berat</p>
+                                <p class="text-white font-medium">${berat} kg</p>
+                            </div>
+                            <div class="bg-[#1E293B] p-3 rounded-xl">
+                                <p class="text-[#64748B] text-xs">Usia</p>
+                                <p class="text-white font-medium">${usia} tahun</p>
+                            </div>
+                            <div class="bg-[#1E293B] p-3 rounded-xl">
+                                <p class="text-[#64748B] text-xs">Gender</p>
+                                <p class="text-white font-medium">${gender === 'male' ? 'Laki-laki' : 'Perempuan'}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Save Button -->
+                    <button onclick="saveBMIResult()" class="w-full bg-[#1E293B] hover:bg-[#2D3A4F] text-white py-3 rounded-xl transition flex items-center justify-center space-x-2 mt-4">
+                        <i class="fas fa-save"></i>
+                        <span>Simpan ke History</span>
+                    </button>
+                </div>
+            `;
+            
+            // Simpan ke history
+            saveToHistory(bmi.toFixed(1), kategori, idealMin, idealMax);
+            
+            // Notifikasi
+            showNotif('✅ BMI berhasil dihitung!');
+        }
+
+        // Simpan ke history
+        function saveToHistory(value, kategori, min, max) {
+            try {
+                let history = JSON.parse(localStorage.getItem('healthHistory') || '[]');
+                
+                const record = {
+                    id: Date.now(),
+                    type: 'BMI',
+                    value: value,
+                    detail: `${kategori} - Ideal: ${min}-${max}kg`,
+                    unit: 'BMI',
+                    category: kategori.split(' ')[0],
+                    timestamp: new Date().toISOString(),
+                    date: new Date().toLocaleDateString('id-ID')
+                };
+                
+                history.unshift(record);
+                if (history.length > 30) history.pop();
+                localStorage.setItem('healthHistory', JSON.stringify(history));
+            } catch (e) {
+                console.error('Error saving history:', e);
+            }
+        }
+
+        function saveBMIResult() {
+            showNotif('✅ Disimpan ke history!');
+        }
+
+        function exportBMIPDF() {
+            showNotif('📄 PDF akan didownload...');
+        }
+
+        function showNotif(msg) {
+            alert(msg);
+        }
+    </script>
+</body>
+</html>

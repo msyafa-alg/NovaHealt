@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics | NovaHealth Pro</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-[#0A0B0E] font-['Inter']">
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 bg-[#0A0B0E]/95 backdrop-blur-xl border-b border-[#1E293B]">
+        <div class="container mx-auto px-6">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-[#3B82F6] to-[#2563EB] rounded-xl flex items-center justify-center">
+                        <i class="fas fa-cube text-white text-lg"></i>
+                    </div>
+                    <span class="text-xl font-bold text-white">Nova<span class="text-[#3B82F6]">Health</span></span>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="index.html" class="nav-link">Dashboard</a>
+                    <a href="bmi.html" class="nav-link">BMI</a>
+                    <a href="carbon.html" class="nav-link">Carbon</a>
+                    <a href="bmr.html" class="nav-link">BMR</a>
+                    <a href="ideal-weight.html" class="nav-link">Ideal Weight</a>
+                    <a href="analytics.html" class="nav-link active">Analytics</a>
+                    <a href="history.html" class="nav-link">History</a>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <button class="w-10 h-10 rounded-xl bg-[#1E293B] flex items-center justify-center hover:bg-[#2D3A4F] transition">
+                        <i class="fas fa-bell text-[#94A3B8]"></i>
+                    </button>
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#2563EB] flex items-center justify-center">
+                        <span class="text-white font-medium">AP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="pt-20 bg-gradient-to-r from-[#EC4899]/10 to-transparent border-b border-[#1E293B]">
+        <div class="container mx-auto px-6 py-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-white">Health <span class="text-[#EC4899]">Analytics</span></h1>
+                    <p class="text-[#94A3B8] mt-1">Track your progress with advanced metrics</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="refreshData()" class="px-4 py-2 bg-[#1E293B] rounded-xl text-white hover:bg-[#2D3A4F] transition">
+                        <i class="fas fa-sync-alt mr-2"></i>Refresh
+                    </button>
+                    <button onclick="exportReport()" class="px-4 py-2 bg-[#EC4899] rounded-xl text-white hover:bg-[#DB2777] transition">
+                        <i class="fas fa-download mr-2"></i>Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+        <!-- Time Range Selector -->
+        <div class="flex space-x-2 mb-8">
+            <button onclick="setTimeRange('week')" class="time-btn active px-4 py-2 bg-[#EC4899] text-white rounded-lg text-sm">Week</button>
+            <button onclick="setTimeRange('month')" class="time-btn px-4 py-2 bg-[#1E293B] text-[#94A3B8] rounded-lg text-sm hover:bg-[#2D3A4F] transition">Month</button>
+            <button onclick="setTimeRange('year')" class="time-btn px-4 py-2 bg-[#1E293B] text-[#94A3B8] rounded-lg text-sm hover:bg-[#2D3A4F] transition">Year</button>
+            <button onclick="setTimeRange('all')" class="time-btn px-4 py-2 bg-[#1E293B] text-[#94A3B8] rounded-lg text-sm hover:bg-[#2D3A4F] transition">All Time</button>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="stat-card">
+                <p class="text-[#64748B] text-sm">Average BMI</p>
+                <p class="text-3xl font-bold text-white" id="avgBmi">22.4</p>
+                <p class="text-xs text-[#10B981] mt-1">↓ 0.3 from last period</p>
+            </div>
+            
+            <div class="stat-card">
+                <p class="text-[#64748B] text-sm">Avg Carbon</p>
+                <p class="text-3xl font-bold text-white" id="avgCarbon">14.8 kg</p>
+                <p class="text-xs text-[#EF4444] mt-1">↑ 1.2 kg from last period</p>
+            </div>
+            
+            <div class="stat-card">
+                <p class="text-[#64748B] text-sm">Avg BMR</p>
+                <p class="text-3xl font-bold text-white" id="avgBmr">1,832 cal</p>
+                <p class="text-xs text-[#64748B] mt-1">Stable</p>
+            </div>
+            
+            <div class="stat-card">
+                <p class="text-[#64748B] text-sm">Total Records</p>
+                <p class="text-3xl font-bold text-white" id="totalRecords">47</p>
+                <p class="text-xs text-[#64748B] mt-1">Last 30 days</p>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- BMI Trend Chart -->
+            <div class="calculator-card">
+                <h3 class="text-white font-semibold mb-4">BMI Trend</h3>
+                <div class="chart-container">
+                    <canvas id="bmiChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Carbon Trend Chart -->
+            <div class="calculator-card">
+                <h3 class="text-white font-semibold mb-4">Carbon Footprint Trend</h3>
+                <div class="chart-container">
+                    <canvas id="carbonChart"></canvas>
+                </div>
+            </div>
+
+            <!-- BMR Trend Chart -->
+            <div class="calculator-card">
+                <h3 class="text-white font-semibold mb-4">BMR Trend</h3>
+                <div class="chart-container">
+                    <canvas id="bmrChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Weight Distribution -->
+            <div class="calculator-card">
+                <h3 class="text-white font-semibold mb-4">Weight Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="weightChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Insights Card -->
+        <div class="calculator-card bg-gradient-to-br from-[#EC4899]/10 to-transparent">
+            <h3 class="text-white font-semibold mb-4">AI Insights & Recommendations</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-4 bg-[#1E293B]/50 rounded-xl">
+                    <i class="fas fa-lightbulb text-[#EC4899] text-xl mb-2"></i>
+                    <p class="text-white text-sm font-medium">BMI Pattern</p>
+                    <p class="text-[#94A3B8] text-xs mt-1">Your BMI is trending downward. Keep up the good work!</p>
+                </div>
+                
+                <div class="p-4 bg-[#1E293B]/50 rounded-xl">
+                    <i class="fas fa-chart-line text-[#EC4899] text-xl mb-2"></i>
+                    <p class="text-white text-sm font-medium">Carbon Reduction</p>
+                    <p class="text-[#94A3B8] text-xs mt-1">Try to reduce car usage by 20% to lower your footprint.</p>
+                </div>
+                
+                <div class="p-4 bg-[#1E293B]/50 rounded-xl">
+                    <i class="fas fa-fire text-[#EC4899] text-xl mb-2"></i>
+                    <p class="text-white text-sm font-medium">BMR Stable</p>
+                    <p class="text-[#94A3B8] text-xs mt-1">Your metabolism is consistent. Great job maintaining!</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="js/anti-spam.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/analytics.js"></script>
+</body>
+</html>

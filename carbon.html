@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Carbon Footprint | NovaHealth Pro</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        @media (max-width: 768px) {
+            .nav-menu {
+                position: fixed;
+                top: 80px;
+                left: -100%;
+                width: 80%;
+                height: calc(100vh - 80px);
+                background: #0F1117;
+                border-right: 1px solid #1E293B;
+                transition: 0.3s ease;
+                padding: 2rem 1.5rem;
+                z-index: 100;
+            }
+            .nav-menu.active { left: 0; }
+            .nav-overlay {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                width: 100%;
+                height: calc(100vh - 80px);
+                background: rgba(0,0,0,0.7);
+                backdrop-filter: blur(4px);
+                z-index: 90;
+                opacity: 0;
+                visibility: hidden;
+                transition: 0.3s ease;
+            }
+            .nav-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+            .nav-link {
+                display: block;
+                padding: 1rem;
+                font-size: 1.1rem;
+                border-bottom: 1px solid #1E293B;
+            }
+            .calculator-input { font-size: 16px !important; }
+        }
+        
+        /* Tree animation */
+        .tree-icon {
+            animation: treeWave 2s ease-in-out infinite;
+        }
+        
+        @keyframes treeWave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            75% { transform: rotate(-5deg); }
+        }
+    </style>
+</head>
+<body class="bg-[#0A0B0E] font-['Inter']">
+    <!-- Navbar SAMA PERSIS dengan BMR -->
+    <nav class="fixed w-full z-50 bg-[#0A0B0E]/95 backdrop-blur-xl border-b border-[#1E293B]">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-[#3B82F6] to-[#2563EB] rounded-xl flex items-center justify-center">
+                        <i class="fas fa-cube text-white text-sm sm:text-lg"></i>
+                    </div>
+                    <span class="text-lg sm:text-xl font-bold text-white">Nova<span class="text-[#3B82F6]">Health</span></span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="index.html" class="nav-link">Dashboard</a>
+                    <a href="bmi.html" class="nav-link">BMI</a>
+                    <a href="carbon.html" class="nav-link active">Carbon</a>
+                    <a href="bmr.html" class="nav-link">BMR</a>
+                    <a href="ideal-weight.html" class="nav-link">Ideal Weight</a>
+                    <a href="analytics.html" class="nav-link">Analytics</a>
+                    <a href="history.html" class="nav-link">History</a>
+                </div>
+
+                <!-- Right Menu -->
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <button class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#1E293B] flex items-center justify-center hover:bg-[#2D3A4F] transition">
+                        <i class="fas fa-bell text-[#94A3B8] text-sm sm:text-base"></i>
+                    </button>
+                    
+                    <!-- Mobile Menu Button -->
+                    <button id="menuBtn" class="md:hidden w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#1E293B] flex items-center justify-center hover:bg-[#2D3A4F] transition">
+                        <i class="fas fa-bars text-[#94A3B8] text-lg"></i>
+                    </button>
+                    
+                    <!-- User Avatar -->
+                    <div class="hidden sm:block w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#2563EB] flex items-center justify-center">
+                        <span class="text-white font-medium text-sm">AP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="overlay" class="nav-overlay md:hidden"></div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="nav-menu md:hidden">
+        <div class="flex flex-col space-y-2">
+            <a href="index.html" class="nav-link text-[#94A3B8] hover:text-white transition">
+                <i class="fas fa-home w-6 mr-3"></i>Dashboard
+            </a>
+            <a href="bmi.html" class="nav-link text-[#94A3B8] hover:text-white transition">
+                <i class="fas fa-weight-scale w-6 mr-3"></i>BMI
+            </a>
+            <a href="carbon.html" class="nav-link active bg-[#1E293B] text-[#10B981]">
+                <i class="fas fa-leaf w-6 mr-3"></i>Carbon
+            </a>
+            <a href="bmr.html" class="nav-link text-[#94A3B8] hover:text-white transition">
+                <i class="fas fa-fire w-6 mr-3"></i>BMR
+            </a>
+            <a href="ideal-weight.html" class="nav-link text-[#94A3B8] hover:text-white transition">
+                <i class="fas fa-dumbbell w-6 mr-3"></i>Ideal Weight
+            </a>
+            <a href="analytics.html" class="nav-link text-[#94A3B8] hover:text-white transition">
+                <i class="fas fa-chart-line w-6 mr-3"></i>Analytics
+            </a>
+            <a href="history.html" class="nav-link text-[#94A3B8] hover:text-white transition">
+                <i class="fas fa-history w-6 mr-3"></i>History
+            </a>
+        </div>
+        
+        <!-- User Info Mobile -->
+        <div class="absolute bottom-8 left-4 right-4">
+            <div class="bg-[#1E293B] rounded-xl p-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#2563EB] flex items-center justify-center">
+                        <span class="text-white font-medium">AP</span>
+                    </div>
+                    <div>
+                        <p class="text-white text-sm font-medium">Alexander Pierce</p>
+                        <p class="text-[#64748B] text-xs">Enterprise Plan</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="pt-20 bg-gradient-to-r from-[#10B981]/10 to-transparent border-b border-[#1E293B]">
+        <div class="container mx-auto px-4 py-6 sm:py-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="flex items-center space-x-2 text-sm mb-2">
+                        <a href="index.html" class="text-[#64748B] hover:text-white transition">Dashboard</a>
+                        <i class="fas fa-chevron-right text-[#64748B] text-xs"></i>
+                        <span class="text-white">Carbon Footprint</span>
+                    </div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white">Carbon <span class="text-[#10B981]">Footprint</span> Calculator</h1>
+                    <p class="text-[#94A3B8] text-sm sm:text-base mt-1">Measure your environmental impact and help save the planet 🌍</p>
+                </div>
+                <div class="hidden sm:flex items-center space-x-2">
+                    <div class="bg-[#1E293B] px-4 py-2 rounded-xl">
+                        <span class="text-[#10B981] text-sm"><i class="fas fa-leaf mr-1"></i> Eco Score</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Calculator Form -->
+            <div class="calculator-card">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-[#10B981]/20 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-calculator text-[#10B981] text-lg sm:text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-bold text-white">Input Your Data</h2>
+                        <p class="text-[#64748B] text-xs sm:text-sm">Enter your daily consumption</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <!-- Vehicle Usage -->
+                    <div>
+                        <label class="block text-[#94A3B8] text-xs sm:text-sm mb-2">
+                            <i class="fas fa-car mr-2 text-[#10B981]"></i>Vehicle Usage (km/day)
+                        </label>
+                        <input type="number" id="kendaraan" class="calculator-input w-full p-3 bg-[#1E293B] border border-[#2D3A4F] rounded-xl text-white" placeholder="e.g., 20" value="20" min="0" step="0.1">
+                        <p class="text-[#64748B] text-xs mt-1">🚗 Car: 0.21 kg CO2 per km</p>
+                    </div>
+                    
+                    <!-- Electricity Usage -->
+                    <div>
+                        <label class="block text-[#94A3B8] text-xs sm:text-sm mb-2">
+                            <i class="fas fa-bolt mr-2 text-[#10B981]"></i>Electricity (kWh/day)
+                        </label>
+                        <input type="number" id="listrik" class="calculator-input w-full p-3 bg-[#1E293B] border border-[#2D3A4F] rounded-xl text-white" placeholder="e.g., 10" value="10" min="0" step="0.1">
+                        <p class="text-[#64748B] text-xs mt-1">⚡ Grid electricity: 0.85 kg CO2 per kWh</p>
+                    </div>
+                    
+                    <!-- Gas Usage -->
+                    <div>
+                        <label class="block text-[#94A3B8] text-xs sm:text-sm mb-2">
+                            <i class="fas fa-fire mr-2 text-[#10B981]"></i>Gas Usage (kg/day)
+                        </label>
+                        <input type="number" id="gas" class="calculator-input w-full p-3 bg-[#1E293B] border border-[#2D3A4F] rounded-xl text-white" placeholder="e.g., 2" value="2" min="0" step="0.1">
+                        <p class="text-[#64748B] text-xs mt-1">🔥 LPG: 2.98 kg CO2 per kg</p>
+                    </div>
+                    
+                    <!-- Flights (optional) -->
+                    <div>
+                        <label class="block text-[#94A3B8] text-xs sm:text-sm mb-2">
+                            <i class="fas fa-plane mr-2 text-[#10B981]"></i>Flights (hours/month) - Optional
+                        </label>
+                        <input type="number" id="flights" class="calculator-input w-full p-3 bg-[#1E293B] border border-[#2D3A4F] rounded-xl text-white" placeholder="e.g., 5" value="0" min="0" step="0.5">
+                    </div>
+
+                    <!-- Calculate Button -->
+                    <button onclick="hitungCarbon()" class="w-full bg-gradient-to-r from-[#10B981] to-[#059669] text-white py-4 rounded-xl font-medium hover:shadow-lg hover:shadow-[#10B981]/20 transition-all transform hover:scale-[1.02] flex items-center justify-center space-x-2 mt-4">
+                        <i class="fas fa-leaf"></i>
+                        <span>Calculate Carbon Footprint</span>
+                    </button>
+                </div>
+
+                <!-- Info Box -->
+                <div class="mt-6 p-4 bg-[#1E293B] rounded-xl">
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-info-circle text-[#10B981] mt-1"></i>
+                        <div>
+                            <p class="text-white text-xs sm:text-sm font-medium">What is Carbon Footprint?</p>
+                            <p class="text-[#94A3B8] text-xs mt-1">Total greenhouse gases generated by our actions. 1 tree absorbs ~20kg CO2 per year 🌳</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Area - DENGAN SEMUA FITUR -->
+            <div class="calculator-card" id="resultCard">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-[#10B981]/20 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-globe-asia text-[#10B981] text-lg sm:text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg sm:text-xl font-bold text-white">Your Impact</h2>
+                            <p class="text-[#64748B] text-xs sm:text-sm">Carbon footprint results</p>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="exportCarbonPDF()" class="px-3 py-1.5 bg-[#1E293B] rounded-lg text-[#94A3B8] hover:text-white transition text-xs">
+                            <i class="fas fa-download mr-1"></i> PDF
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Result Container - LENGKAP DENGAN POHON -->
+                <div id="carbonResult" class="hidden">
+                    <!-- Akan diisi JavaScript -->
+                </div>
+                
+                <!-- Empty State -->
+                <div id="emptyCarbonResult" class="text-center py-12">
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-[#10B981]/20 to-[#059669]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-tree text-[#10B981] text-3xl sm:text-4xl tree-icon"></i>
+                    </div>
+                    <p class="text-[#E2E8F0] text-base sm:text-lg font-medium mb-2">Hitung Jejak Karbonmu 🌍</p>
+                    <p class="text-[#64748B] text-xs sm:text-sm max-w-sm mx-auto">
+                        Masukkan data konsumsi harianmu dan lihat berapa pohon yang harus ditanam!
+                    </p>
+                </div>
+            </div>
+
+            <!-- Tips Section - Tampil setelah calculate -->
+            <div class="calculator-card lg:col-span-2" id="tipsCard" style="display: none;">
+                <div class="flex items-center space-x-3 mb-6">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-[#10B981]/20 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-lightbulb text-[#10B981] text-lg sm:text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-bold text-white">🌱 Eco-Friendly Tips</h2>
+                        <p class="text-[#64748B] text-xs sm:text-sm">Personalized recommendations to reduce your footprint</p>
+                    </div>
+                </div>
+                
+                <div id="eco-tips-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Tips akan diisi JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Mobile Menu Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuBtn = document.getElementById('menuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('overlay');
+            
+            if (menuBtn && mobileMenu && overlay) {
+                menuBtn.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                    
+                    const icon = menuBtn.querySelector('i');
+                    if (mobileMenu.classList.contains('active')) {
+                        icon.classList.remove('fa-bars');
+                        icon.classList.add('fa-times');
+                    } else {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                });
+                
+                overlay.addEventListener('click', function() {
+                    mobileMenu.classList.remove('active');
+                    overlay.classList.remove('active');
+                    const icon = menuBtn.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                });
+            }
+        });
+
+        // Fungsi Hitung Carbon - LENGKAP DENGAN POHON
+        function hitungCarbon() {
+            console.log("Calculating carbon footprint...");
+            
+            // Ambil nilai input
+            const kendaraan = parseFloat(document.getElementById('kendaraan').value) || 0;
+            const listrik = parseFloat(document.getElementById('listrik').value) || 0;
+            const gas = parseFloat(document.getElementById('gas').value) || 0;
+            const flights = parseFloat(document.getElementById('flights').value) || 0;
+            
+            // Validasi
+            if (kendaraan === 0 && listrik === 0 && gas === 0 && flights === 0) {
+                alert('Masukkan setidaknya satu nilai!');
+                return;
+            }
+            
+            // Hitung emisi
+            const carbonKendaraan = kendaraan * 0.21;
+            const carbonListrik = listrik * 0.85;
+            const carbonGas = gas * 2.98;
+            const carbonFlights = flights * 90 / 30; // per hari
+            
+            // Total
+            const totalDaily = carbonKendaraan + carbonListrik + carbonGas + carbonFlights;
+            const totalYearly = totalDaily * 365;
+            
+            // Hitung pohon (1 pohon = 20kg CO2/tahun)
+            const treesNeeded = Math.ceil(totalYearly / 20);
+            
+            // Tentukan level
+            let level = '', levelColor = '', levelIcon = '', levelMessage = '';
+            
+            if (totalDaily < 10) {
+                level = 'Rendah';
+                levelColor = 'text-[#10B981]';
+                levelIcon = 'fa-smile';
+                levelMessage = 'Bagus! Jejak karbonmu rendah. Pertahankan! 🌱';
+            } else if (totalDaily < 20) {
+                level = 'Sedang';
+                levelColor = 'text-[#F59E0B]';
+                levelIcon = 'fa-meh';
+                levelMessage = 'Jejak karbonmu sedang. Mulai kurangi ya! 🌿';
+            } else if (totalDaily < 30) {
+                level = 'Tinggi';
+                levelColor = 'text-[#EF4444]';
+                levelIcon = 'fa-frown';
+                levelMessage = 'Jejak karbonmu tinggi. Yuk mulai hemat energi! 🌳';
+            } else {
+                level = 'Sangat Tinggi';
+                levelColor = 'text-[#7F1D1D]';
+                levelIcon = 'fa-dizzy';
+                levelMessage = 'Jejak karbonmu sangat tinggi. Saatnya bertindak! 🌲';
+            }
+            
+            // Tampilkan hasil
+            document.getElementById('emptyCarbonResult').style.display = 'none';
+            document.getElementById('carbonResult').classList.remove('hidden');
+            document.getElementById('tipsCard').style.display = 'block';
+            
+            const resultDiv = document.getElementById('carbonResult');
+            resultDiv.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Main Result -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="text-center p-4 sm:p-6 bg-gradient-to-br from-[#10B981]/20 to-[#059669]/20 rounded-2xl">
+                            <p class="text-[#94A3B8] text-xs sm:text-sm mb-2">Daily Carbon</p>
+                            <div class="text-3xl sm:text-4xl font-bold text-[#10B981]">${totalDaily.toFixed(2)}</div>
+                            <p class="text-[#64748B] text-xs mt-2">kg CO2 / hari</p>
+                        </div>
+                        
+                        <div class="text-center p-4 sm:p-6 bg-gradient-to-br from-[#3B82F6]/20 to-[#2563EB]/20 rounded-2xl">
+                            <p class="text-[#94A3B8] text-xs sm:text-sm mb-2">Yearly Carbon</p>
+                            <div class="text-3xl sm:text-4xl font-bold text-[#3B82F6]">${totalYearly.toFixed(0)}</div>
+                            <p class="text-[#64748B] text-xs mt-2">kg CO2 / tahun</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Level Badge -->
+                    <div class="flex items-center justify-center space-x-2 p-4 bg-[#1E293B] rounded-xl">
+                        <i class="fas ${levelIcon} ${levelColor} text-lg sm:text-xl"></i>
+                        <span class="text-white text-sm sm:text-base">Jejak karbonmu:</span>
+                        <span class="font-bold ${levelColor} text-sm sm:text-base">${level}</span>
+                    </div>
+                    
+                    <!-- TREES SECTION - INI YANG ILANG -->
+                    <div class="p-6 bg-gradient-to-br from-[#10B981]/30 to-[#059669]/30 rounded-2xl border-2 border-[#10B981]/50">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-[#10B981] rounded-xl flex items-center justify-center tree-icon">
+                                    <i class="fas fa-tree text-white text-2xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-white text-base sm:text-lg font-bold">Pohon yang Harus Ditanam</p>
+                                    <p class="text-[#94A3B8] text-xs">untuk menyerap karbon tahunanmu</p>
+                                </div>
+                            </div>
+                            <span class="text-4xl sm:text-5xl font-extrabold text-white">${treesNeeded}</span>
+                        </div>
+                        
+                        <!-- Progress Bar -->
+                        <div class="mt-4">
+                            <div class="flex justify-between text-xs text-[#94A3B8] mb-1">
+                                <span>Dampak terhadap lingkungan</span>
+                                <span>${Math.min(Math.round((totalDaily / 30) * 100), 100)}%</span>
+                            </div>
+                            <div class="h-3 bg-[#1E293B] rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-[#10B981] to-[#059669] rounded-full" style="width: ${Math.min((totalDaily / 30) * 100, 100)}%"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Eco Message -->
+                        <div class="mt-4 p-3 bg-[#1E293B]/80 rounded-xl">
+                            <p class="text-[#94A3B8] text-xs sm:text-sm">
+                                <i class="fas fa-quote-left text-[#10B981] mr-1"></i>
+                                ${levelMessage} Dengan menanam ${treesNeeded} pohon, kamu bisa menetralisir jejak karbonmu!
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Breakdown -->
+                    <div>
+                        <p class="text-[#94A3B8] text-sm mb-3">Rincian emisi:</p>
+                        <div class="space-y-2">
+                            ${carbonKendaraan > 0 ? `
+                            <div class="flex items-center justify-between p-2">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-car text-[#10B981] w-5"></i>
+                                    <span class="text-white text-sm">Kendaraan</span>
+                                </div>
+                                <span class="text-white font-medium">${carbonKendaraan.toFixed(2)} kg</span>
+                            </div>
+                            ` : ''}
+                            
+                            ${carbonListrik > 0 ? `
+                            <div class="flex items-center justify-between p-2">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-bolt text-[#F59E0B] w-5"></i>
+                                    <span class="text-white text-sm">Listrik</span>
+                                </div>
+                                <span class="text-white font-medium">${carbonListrik.toFixed(2)} kg</span>
+                            </div>
+                            ` : ''}
+                            
+                            ${carbonGas > 0 ? `
+                            <div class="flex items-center justify-between p-2">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-fire text-[#EF4444] w-5"></i>
+                                    <span class="text-white text-sm">Gas</span>
+                                </div>
+                                <span class="text-white font-medium">${carbonGas.toFixed(2)} kg</span>
+                            </div>
+                            ` : ''}
+                            
+                            ${carbonFlights > 0 ? `
+                            <div class="flex items-center justify-between p-2">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-plane text-[#8B5CF6] w-5"></i>
+                                    <span class="text-white text-sm">Pesawat</span>
+                                </div>
+                                <span class="text-white font-medium">${carbonFlights.toFixed(2)} kg</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <!-- Save Button -->
+                    <button onclick="saveCarbonResult()" class="w-full bg-[#1E293B] hover:bg-[#2D3A4F] text-white py-3 rounded-xl transition flex items-center justify-center space-x-2 mt-4">
+                        <i class="fas fa-save"></i>
+                        <span>Simpan ke History</span>
+                    </button>
+                </div>
+            `;
+            
+            // Generate eco tips
+            generateEcoTips(kendaraan, listrik, gas, flights);
+            
+            // Save ke history (sederhana)
+            saveToHistory(totalDaily.toFixed(2), treesNeeded, level);
+            
+            // Notifikasi
+            showNotif('✅ Karbon berhasil dihitung!');
+        }
+
+        // Generate tips
+        function generateEcoTips(kendaraan, listrik, gas, flights) {
+            const tipsContainer = document.getElementById('eco-tips-container');
+            let tipsHTML = '';
+            
+            const tips = [
+                {
+                    icon: 'fa-bus',
+                    title: 'Transportasi Umum',
+                    desc: 'Gunakan transportasi umum atau carpool untuk mengurangi emisi kendaraan.'
+                },
+                {
+                    icon: 'fa-lightbulb',
+                    title: 'Hemat Listrik',
+                    desc: 'Matikan lampu dan cabut charger saat tidak digunakan.'
+                },
+                {
+                    icon: 'fa-tree',
+                    title: 'Tanam Pohon',
+                    desc: 'Setiap pohon menyerap 20kg CO2 per tahun. Ayo mulai menanam!'
+                }
+            ];
+            
+            tips.forEach(tip => {
+                tipsHTML += `
+                    <div class="p-4 bg-[#1E293B] rounded-xl hover:bg-[#2D3A4F] transition">
+                        <i class="fas ${tip.icon} text-[#10B981] text-xl mb-3"></i>
+                        <h4 class="text-white font-medium text-sm mb-2">${tip.title}</h4>
+                        <p class="text-[#94A3B8] text-xs">${tip.desc}</p>
+                    </div>
+                `;
+            });
+            
+            tipsContainer.innerHTML = tipsHTML;
+        }
+
+        // Save ke history
+        function saveToHistory(value, trees, level) {
+            try {
+                let history = JSON.parse(localStorage.getItem('healthHistory') || '[]');
+                
+                const record = {
+                    id: Date.now(),
+                    type: 'Carbon',
+                    value: value + ' kg',
+                    detail: `${trees} pohon/hari - Level: ${level}`,
+                    unit: 'kg CO2',
+                    timestamp: new Date().toISOString(),
+                    date: new Date().toLocaleDateString('id-ID')
+                };
+                
+                history.unshift(record);
+                if (history.length > 30) history.pop();
+                localStorage.setItem('healthHistory', JSON.stringify(history));
+                
+                console.log('History saved:', record);
+            } catch (e) {
+                console.error('Error saving history:', e);
+            }
+        }
+
+        // Save result
+        function saveCarbonResult() {
+            showNotif('✅ Disimpan ke history!');
+        }
+
+        // Export PDF
+        function exportCarbonPDF() {
+            showNotif('📄 PDF akan didownload...');
+        }
+
+        // Notifikasi sederhana
+        function showNotif(msg) {
+            alert(msg); // Sederhana dulu
+        }
+    </script>
+</body>
+</html>

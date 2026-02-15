@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BMR Calculator | NovaHealth Pro</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        @media (max-width: 768px) {
+            .nav-menu {
+                position: fixed;
+                top: 80px;
+                left: -100%;
+                width: 80%;
+                height: calc(100vh - 80px);
+                background: #0F1117;
+                border-right: 1px solid #1E293B;
+                transition: 0.3s ease;
+                padding: 2rem 1.5rem;
+                z-index: 100;
+            }
+            .nav-menu.active { left: 0; }
+            .nav-overlay {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                width: 100%;
+                height: calc(100vh - 80px);
+                background: rgba(0,0,0,0.7);
+                backdrop-filter: blur(4px);
+                z-index: 90;
+                opacity: 0;
+                visibility: hidden;
+                transition: 0.3s ease;
+            }
+            .nav-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+            .nav-link {
+                display: block;
+                padding: 1rem;
+                font-size: 1.1rem;
+                border-bottom: 1px solid #1E293B;
+            }
+            .calculator-input { font-size: 16px !important; }
+        }
+        
+        @keyframes flame {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .bmr-icon {
+            animation: flame 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-[#0A0B0E] font-['Inter']">
+    <!-- Navbar SAMA -->
+    <nav class="fixed w-full z-50 bg-[#0A0B0E]/95 backdrop-blur-xl border-b border-[#1E293B]">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-[#3B82F6] to-[#2563EB] rounded-xl flex items-center justify-center">
+                        <i class="fas fa-cube text-white text-sm sm:text-lg"></i>
+                    </div>
+                    <span class="text-lg sm:text-xl font-bold text-white">Nova<span class="text-[#3B82F6]">Health</span></span>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="index.html" class="nav-link">Dashboard</a>
+                    <a href="bmi.html" class="nav-link">BMI</a>
+                    <a href="carbon.html" class="nav-link">Carbon</a>
+                    <a href="bmr.html" class="nav-link active">BMR</a>
+                    <a href="ideal-weight.html" class="nav-link">Ideal Weight</a>
+                    <a href="analytics.html" class="nav-link">Analytics</a>
+                    <a href="history.html" class="nav-link">History</a>
+                </div>
+
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <button class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#1E293B] flex items-center justify-center">
+                        <i class="fas fa-bell text-[#94A3B8] text-sm sm:text-base"></i>
+                    </button>
+                    <button id="menuBtn" class="md:hidden w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#1E293B] flex items-center justify-center">
+                        <i class="fas fa-bars text-[#94A3B8] text-lg"></i>
+                    </button>
+                    <div class="hidden sm:block w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#2563EB] flex items-center justify-center">
+                        <span class="text-white font-medium text-sm">AP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="overlay" class="nav-overlay md:hidden"></div>
+    <div id="mobileMenu" class="nav-menu md:hidden">
+        <div class="flex flex-col space-y-2">
+            <a href="index.html" class="nav-link text-[#94A3B8]"><i class="fas fa-home w-6 mr-3"></i>Dashboard</a>
+            <a href="bmi.html" class="nav-link text-[#94A3B8]"><i class="fas fa-weight-scale w-6 mr-3"></i>BMI</a>
+            <a href="carbon.html" class="nav-link text-[#94A3B8]"><i class="fas fa-leaf w-6 mr-3"></i>Carbon</a>
+            <a href="bmr.html" class="nav-link active bg-[#1E293B] text-[#F59E0B]"><i class="fas fa-fire w-6 mr-3"></i>BMR</a>
+            <a href="ideal-weight.html" class="nav-link text-[#94A3B8]"><i class="fas fa-dumbbell w-6 mr-3"></i>Ideal Weight</a>
+            <a href="analytics.html" class="nav-link text-[#94A3B8]"><i class="fas fa-chart-line w-6 mr-3"></i>Analytics</a>
+            <a href="history.html" class="nav-link text-[#94A3B8]"><i class="fas fa-history w-6 mr-3"></i>History</a>
+        </div>
+        <div class="absolute bottom-8 left-4 right-4">...</div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="pt-20 bg-gradient-to-r from-[#F59E0B]/10 to-transparent border-b border-[#1E293B]">
+        <div class="container mx-auto px-4 py-6 sm:py-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="flex items-center space-x-2 text-sm mb-2">
+                        <a href="index.html" class="text-[#64748B] hover:text-white transition">Dashboard</a>
+                        <i class="fas fa-chevron-right text-[#64748B] text-xs"></i>
+                        <span class="text-white">BMR Calculator</span>
+                    </div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white">Basal Metabolic Rate <span class="text-[#F59E0B]">Calculator</span></h1>
+                    <p class="text-[#94A3B8] text-sm sm:text-base mt-1">Hitung kebutuhan kalori harianmu untuk menjaga, menurunkan, atau menambah berat badan</p>
+                </div>
+                <div class="hidden sm:flex items-center space-x-2">
+                    <div class="bg-[#1E293B] px-4 py-2 rounded-xl">
+                        <span class="text-[#F59E0B] text-sm"><i class="fas fa-fire mr-1"></i> Kalori Tracker</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Calculator Form -->
+            <div class="lg:col-span-1">
+                <div class="calculator-card sticky top-24">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 bg-[#F59E0B]/20 rounded-xl flex items-center justify-center bmr-icon">
+                            <i class="fas fa-fire text-[#F59E0B] text-lg sm:text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg sm:text-xl font-bold text-white">Input Data</h2>
+                            <p class="text-[#64748B] text-xs sm:text-sm">Masukkan data kamu</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- Gender Toggle -->
+                        <div>
+                            <label class="block text-[#94A3B8] text-xs sm:text-sm mb-2">Jenis Kelamin</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button id="genderMale" onclick="setGender('male')" class="gender-btn active bg-[#F59E0B] text-white py-3 px-4 rounded-xl text-sm">
+                                    <i class="fas fa-mars mr-2"></i>Laki
+                                </button>
+                                <button id="genderFemale" onclick="setGender('female')" class="gender-btn bg-[#1E293B] text-[#94A3B8] py-3 px-4 rounded-xl text-sm">
+                                    <i class="fas fa-venus mr-2"></i>Perempuan
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-[#94A3B8] text-xs sm:text-sm mb-2">Usia (tahun)</label>
+                            <input type="number" id="usiaBmr" class="calculator-input w-full p-3 bg-[#1E293B] rounded-xl" value="25">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-[#94A3B8] text-xs sm:text-sm mb-2">Tinggi (cm)</label>
+                            <input type="number" id="tinggiBmr" class="calculator-input w-full p-3 bg-[#1E293B] rounded-xl" value="170">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-[#94A3B8] text-xs sm:text-sm mb-2">Berat (kg)</label>
+                            <input type="number" id="beratBmr" class="calculator-input w-full p-3 bg-[#1E293B] rounded-xl" value="65">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-[#94A3B8] text-xs sm:text-sm mb-2">Aktivitas</label>
+                            <select id="aktivitas" class="calculator-input w-full p-3 bg-[#1E293B] rounded-xl">
+                                <option value="1.2">Tidak pernah olahraga</option>
+                                <option value="1.375">Ringan (1-3x/minggu)</option>
+                                <option value="1.55" selected>Sedang (3-5x/minggu)</option>
+                                <option value="1.725">Berat (6-7x/minggu)</option>
+                                <option value="1.9">Sangat berat (atlet)</option>
+                            </select>
+                        </div>
+
+                        <button onclick="hitungBMR()" class="w-full bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white py-4 rounded-xl font-medium hover:shadow-lg transition-all transform hover:scale-[1.02]">
+                            <i class="fas fa-calculator mr-2"></i>Hitung BMR
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Result Card -->
+                <div class="calculator-card">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-lg sm:text-xl font-bold text-white">Hasil BMR Kamu</h2>
+                        <button onclick="exportBMRPDF()" class="px-3 py-1.5 bg-[#1E293B] rounded-lg text-[#94A3B8] text-xs">
+                            <i class="fas fa-download mr-1"></i> PDF
+                        </button>
+                    </div>
+                    
+                    <div id="bmrResult" class="hidden"></div>
+                    <div id="emptyBmrResult" class="text-center py-12">
+                        <div class="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-[#F59E0B]/20 rounded-full mx-auto mb-4 bmr-icon">
+                            <i class="fas fa-fire text-[#F59E0B] text-3xl sm:text-4xl"></i>
+                        </div>
+                        <p class="text-[#E2E8F0] text-base sm:text-lg font-medium">Hitung BMR-mu! 🔥</p>
+                        <p class="text-[#64748B] text-xs sm:text-sm mt-2">Ketahui kebutuhan kalori harianmu</p>
+                    </div>
+                </div>
+
+                <!-- Chart & Goals -->
+                <div id="chartCard" style="display: none;" class="calculator-card">
+                    <h3 class="text-white font-semibold mb-4">Distribusi Kalori Harian</h3>
+                    <div class="chart-container h-64">
+                        <canvas id="calorieChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Goals Card -->
+                <div id="goalsCard" style="display: none;" class="calculator-card">
+                    <h3 class="text-white font-semibold mb-4">Target Berat Badan</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="bg-[#1E293B] p-3 rounded-xl text-center">
+                            <p class="text-[#94A3B8] text-xs">Turun Ringan</p>
+                            <p class="text-white font-bold" id="mildLoss">-</p>
+                        </div>
+                        <div class="bg-[#1E293B] p-3 rounded-xl text-center">
+                            <p class="text-[#94A3B8] text-xs">Turun Sedang</p>
+                            <p class="text-white font-bold" id="weightLoss">-</p>
+                        </div>
+                        <div class="bg-[#1E293B] p-3 rounded-xl text-center">
+                            <p class="text-[#94A3B8] text-xs">Turun Cepat</p>
+                            <p class="text-white font-bold" id="extremeLoss">-</p>
+                        </div>
+                        <div class="bg-[#1E293B] p-3 rounded-xl text-center">
+                            <p class="text-[#94A3B8] text-xs">Naik Berat</p>
+                            <p class="text-white font-bold" id="weightGain">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/bmr-fixed.js"></script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard | NovaHealth Pro</title>
+    
+    <!-- Tailwind & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        /* Mobile Navbar Fix */
+        @media (max-width: 768px) {
+            .nav-menu {
+                position: fixed;
+                top: 80px;
+                left: -100%;
+                width: 80%;
+                height: calc(100vh - 80px);
+                background: #0F1117;
+                border-right: 1px solid #1E293B;
+                transition: 0.3s ease;
+                padding: 2rem 1.5rem;
+                z-index: 100;
+            }
+            
+            .nav-menu.active {
+                left: 0;
+            }
+            
+            .nav-overlay {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                width: 100%;
+                height: calc(100vh - 80px);
+                background: rgba(0,0,0,0.7);
+                backdrop-filter: blur(4px);
+                z-index: 90;
+                opacity: 0;
+                visibility: hidden;
+                transition: 0.3s ease;
+            }
+            
+            .nav-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            .nav-link {
+                display: block;
+                padding: 1rem;
+                font-size: 1.1rem;
+                border-bottom: 1px solid #1E293B;
+            }
+            
+            .calculator-card {
+                padding: 1.25rem;
+            }
+            
+            .calculator-input {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#0A0B0E] font-['Inter']">
+    <!-- Navbar SAMA PERSIS dengan BMR -->
+    <nav class="fixed w-full z-50 bg-[#0A0B0E]/95 backdrop-blur-xl border-b border-[#1E293B]">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-[#3B82F6] to-[#2563EB] rounded-xl flex items-center justify-center">
+                        <i class="fas fa-cube text-white text-sm sm:text-lg"></i>
+                    </div>
+                    <span class="text-lg sm:text-xl font-bold text-white">Nova<span class="text-[#3B82F6]">Health</span></span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="index.html" class="nav-link active">Dashboard</a>
+                    <a href="bmi.html" class="nav-link">BMI</a>
+                    <a href="carbon.html" class="nav-link">Carbon</a>
+                    <a href="bmr.html" class="nav-link">BMR</a>
+                    <a href="ideal-weight.html" class="nav-link">Ideal Weight</a>
+                    <a href="analytics.html" class="nav-link">Analytics</a>
+                    <a href="history.html" class="nav-link">History</a>
+                </div>
+
+                <!-- Right Menu -->
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <button class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#1E293B] flex items-center justify-center hover:bg-[#2D3A4F] transition">
+                        <i class="fas fa-bell text-[#94A3B8] text-sm sm:text-base"></i>
+                    </button>
+                    
+                    <!-- Mobile Menu Button -->
+                    <button id="menuBtn" class="md:hidden w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-[#1E293B] flex items-center justify-center hover:bg-[#2D3A4F] transition">
+                        <i class="fas fa-bars text-[#94A3B8] text-lg"></i>
+                    </button>
+                    
+                    <!-- User Avatar -->
+                    <div class="hidden sm:block w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#2563EB] flex items-center justify-center">
+                        <span class="text-white font-medium text-sm">AP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="overlay" class="nav-overlay md:hidden"></div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="nav-menu md:hidden">
+        <div class="flex flex-col space-y-2">
+            <a href="index.html" class="nav-link active bg-[#1E293B] text-[#3B82F6]">
+                <i class="fas fa-home w-6 mr-3"></i>Dashboard
+            </a>
+            <a href="bmi.html" class="nav-link text-[#94A3B8] hover:text-white transition">
+                <i class="fas fa-weight-scale w-6 mr-3"></i>BMI
+            </a>
+            <a href="carbon.html" class="nav-link text-[#94A3B8] hover:text-white transition">
+                <i class="fas fa-leaf w-6 mr-3"></i>Carbon
+            </a>
+            <a href="bmr.html" class="nav-link text-[#94A3B8] hover:text-white transition">
+                <i class="fas fa-fire w-6 mr-3"></i>BMR
+            </a>
+            <a href="ideal-weight.html" class="nav-link text-[#94A3B8] hover:text-white transition">
+                <i class="fas fa-dumbbell w-6 mr-3"></i>Ideal Weight
+            </a>
+            <a href="analytics.html" class="nav-link text-[#94A3B8] hover:text-white transition">
+                <i class="fas fa-chart-line w-6 mr-3"></i>Analytics
+            </a>
+            <a href="history.html" class="nav-link text-[#94A3B8] hover:text-white transition">
+                <i class="fas fa-history w-6 mr-3"></i>History
+            </a>
+        </div>
+        
+        <!-- User Info Mobile -->
+        <div class="absolute bottom-8 left-4 right-4">
+            <div class="bg-[#1E293B] rounded-xl p-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#2563EB] flex items-center justify-center">
+                        <span class="text-white font-medium">AP</span>
+                    </div>
+                    <div>
+                        <p class="text-white text-sm font-medium">Alexander Pierce</p>
+                        <p class="text-[#64748B] text-xs">Enterprise Plan</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="pt-20 bg-gradient-to-r from-[#3B82F6]/10 to-transparent border-b border-[#1E293B]">
+        <div class="container mx-auto px-4 py-6 sm:py-8">
+            <h1 class="text-2xl sm:text-3xl font-bold text-white">Health Intelligence <span class="text-[#3B82F6]">Dashboard</span></h1>
+            <p class="text-[#94A3B8] text-sm sm:text-base mt-2">Monitor your health metrics and environmental impact</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-8">
+            <div class="bg-[#0F1117] border border-[#1E293B] rounded-xl p-3 sm:p-4">
+                <p class="text-[#64748B] text-xs sm:text-sm">Last BMI</p>
+                <p class="text-xl sm:text-2xl font-bold text-white">22.4</p>
+                <p class="text-[#10B981] text-xs">Ideal</p>
+            </div>
+            <div class="bg-[#0F1117] border border-[#1E293B] rounded-xl p-3 sm:p-4">
+                <p class="text-[#64748B] text-xs sm:text-sm">Carbon Today</p>
+                <p class="text-xl sm:text-2xl font-bold text-white">15.2 kg</p>
+                <p class="text-[#EF4444] text-xs">↓ -2%</p>
+            </div>
+            <div class="bg-[#0F1117] border border-[#1E293B] rounded-xl p-3 sm:p-4">
+                <p class="text-[#64748B] text-xs sm:text-sm">BMR</p>
+                <p class="text-xl sm:text-2xl font-bold text-white">1,845</p>
+                <p class="text-[#64748B] text-xs">calories</p>
+            </div>
+            <div class="bg-[#0F1117] border border-[#1E293B] rounded-xl p-3 sm:p-4">
+                <p class="text-[#64748B] text-xs sm:text-sm">Ideal Weight</p>
+                <p class="text-xl sm:text-2xl font-bold text-white">65-72</p>
+                <p class="text-[#64748B] text-xs">kg range</p>
+            </div>
+        </div>
+
+        <!-- Quick Access Cards -->
+        <h2 class="text-lg sm:text-xl font-bold text-white mb-4">Quick Access</h2>
+        <div class="grid grid-cols-3 md:grid-cols-6 gap-3">
+            <a href="bmi.html" class="bg-[#0F1117] border border-[#1E293B] rounded-xl p-3 sm:p-4 text-center hover:border-[#3B82F6] transition">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-[#3B82F6]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-weight-scale text-[#3B82F6] text-sm sm:text-base"></i>
+                </div>
+                <h3 class="text-white text-xs sm:text-sm font-medium">BMI</h3>
+            </a>
+            <a href="carbon.html" class="bg-[#0F1117] border border-[#1E293B] rounded-xl p-3 sm:p-4 text-center hover:border-[#10B981] transition">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-[#10B981]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-leaf text-[#10B981] text-sm sm:text-base"></i>
+                </div>
+                <h3 class="text-white text-xs sm:text-sm font-medium">Carbon</h3>
+            </a>
+            <a href="bmr.html" class="bg-[#0F1117] border border-[#1E293B] rounded-xl p-3 sm:p-4 text-center hover:border-[#F59E0B] transition">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-[#F59E0B]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-fire text-[#F59E0B] text-sm sm:text-base"></i>
+                </div>
+                <h3 class="text-white text-xs sm:text-sm font-medium">BMR</h3>
+            </a>
+            <a href="ideal-weight.html" class="bg-[#0F1117] border border-[#1E293B] rounded-xl p-3 sm:p-4 text-center hover:border-[#8B5CF6] transition">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-[#8B5CF6]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-dumbbell text-[#8B5CF6] text-sm sm:text-base"></i>
+                </div>
+                <h3 class="text-white text-xs sm:text-sm font-medium">Ideal</h3>
+            </a>
+            <a href="analytics.html" class="bg-[#0F1117] border border-[#1E293B] rounded-xl p-3 sm:p-4 text-center hover:border-[#EC4899] transition">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-[#EC4899]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-chart-line text-[#EC4899] text-sm sm:text-base"></i>
+                </div>
+                <h3 class="text-white text-xs sm:text-sm font-medium">Analytics</h3>
+            </a>
+            <a href="history.html" class="bg-[#0F1117] border border-[#1E293B] rounded-xl p-3 sm:p-4 text-center hover:border-[#6366F1] transition">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-[#6366F1]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-history text-[#6366F1] text-sm sm:text-base"></i>
+                </div>
+                <h3 class="text-white text-xs sm:text-sm font-medium">History</h3>
+            </a>
+        </div>
+    </main>
+
+    <script>
+        // Mobile Menu Toggle - SAMA PERSIS dengan BMR
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuBtn = document.getElementById('menuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('overlay');
+            
+            if (menuBtn && mobileMenu && overlay) {
+                menuBtn.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                    
+                    const icon = menuBtn.querySelector('i');
+                    if (mobileMenu.classList.contains('active')) {
+                        icon.classList.remove('fa-bars');
+                        icon.classList.add('fa-times');
+                    } else {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                });
+                
+                overlay.addEventListener('click', function() {
+                    mobileMenu.classList.remove('active');
+                    overlay.classList.remove('active');
+                    const icon = menuBtn.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
